@@ -1,0 +1,18 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Kompilacja C# / .NET
+**/[Bb]in/
+**/[Oo]bj/
+
+# Pliki środowisk IDE
+.vs/
+.vscode/
+.idea/
+*.userprefs
+
+# Eksportowane paczki i pliki wykonywalne
+/builds/
+*.exe
+*.zip
