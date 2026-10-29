@@ -16,3 +16,10 @@
 /builds/
 *.exe
 *.zip
+
+
+# Ignorowanie plików tymczasowych Visual Studio i ASP.NET
+/Server/**/bin/
+/Server/**/obj/
+/Server/.vs/
+bulletheaven.db
