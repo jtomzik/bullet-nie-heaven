@@ -11,7 +11,16 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<Bullet_Not_Heaven_DB.Data.AppDbContext>(options =>
     options.UseSqlite("Data Source=bulletheaven.db"));
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
