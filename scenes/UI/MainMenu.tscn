@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://bd84x3d6so2wr"]
+
+[ext_resource type="Script" uid="uid://dqjhjtg77r6y3" path="res://scripts/UI/MainMenu.cs" id="1_11hie"]
+
+[node name="MainMenu" type="Control" unique_id=548158138]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_11hie")
+
+[node name="Background" type="ColorRect" parent="." unique_id=139014629]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.46229059, 0.46229059, 0.46229059, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1652123722]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1988066499]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CenterContainer/MenuContainer" unique_id=171810460]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/MenuContainer" unique_id=1542702379]
+layout_mode = 2
+
+[node name="ButtonStart" type="Button" parent="CenterContainer/MenuContainer" unique_id=1530457398]
+layout_mode = 2
+text = "Start"
+
+[node name="ButtonOptions" type="Button" parent="CenterContainer/MenuContainer" unique_id=116957846]
+layout_mode = 2
+text = "Options"
+
+[node name="ButtonExit" type="Button" parent="CenterContainer/MenuContainer" unique_id=163085705]
+layout_mode = 2
+text = "Exit
+"
+
+[node name="VersionLabel" type="Label" parent="." unique_id=1137446078]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "v0.1.0"

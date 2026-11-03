@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://d3crcqmje8ywe"]
+
+[ext_resource type="Script" uid="uid://dc2ogcgwbjdkn" path="res://scripts/UI/HUD.cs" id="1_5fyfn"]
+
+[node name="GameUI" type="CanvasLayer" unique_id=1057761944]
+script = ExtResource("1_5fyfn")
+
+[node name="HUD" type="Control" parent="." unique_id=404265191]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD" unique_id=388099827]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="TopBarContainer" type="HBoxContainer" parent="HUD/MarginContainer" unique_id=1410311500]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="HealthContainer" type="HBoxContainer" parent="HUD/MarginContainer/TopBarContainer" unique_id=1487956882]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="HUD/MarginContainer/TopBarContainer/HealthContainer" unique_id=471304008]
+layout_mode = 2
+text = "HP:"
+
+[node name="HealthBar" type="ProgressBar" parent="HUD/MarginContainer/TopBarContainer/HealthContainer" unique_id=1747361034]
+modulate = Color(0.8912906, 4.1873755e-06, 8.663535e-07, 1)
+custom_minimum_size = Vector2(200, 24)
+layout_mode = 2
+value = 100.0
+
+[node name="Spacer" type="Control" parent="HUD/MarginContainer/TopBarContainer" unique_id=536172677]
+layout_mode = 2
+
+[node name="TimerContainer" type="HBoxContainer" parent="HUD/MarginContainer/TopBarContainer" unique_id=119181020]
+layout_mode = 2
+
+[node name="TimerLabel" type="Label" parent="HUD/MarginContainer/TopBarContainer/TimerContainer" unique_id=1439613565]
+layout_mode = 2
+text = "Time: 00:00"
