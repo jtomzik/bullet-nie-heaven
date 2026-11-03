@@ -1,0 +1,6 @@
+@Bullet_Not_Heaven_DB_HostAddress = http://localhost:5157
+
+GET {{Bullet_Not_Heaven_DB_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
