@@ -5,7 +5,8 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
-	<Compile Remove="scripts\newtork\**" />
-	<Content Remove="scripts\network\**" />
+  <Compile Remove="scripts\network\**\*.cs" />
+  <None Remove="scripts\network\**\*" />
+  <Content Remove="scripts\network\**\*" />
 </ItemGroup>
 </Project>
