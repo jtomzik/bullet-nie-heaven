@@ -19,7 +19,7 @@
 
 
 # Ignorowanie plików tymczasowych Visual Studio i ASP.NET
-/Server/**/bin/
-/Server/**/obj/
-/Server/.vs/
+/scripts/network/**/bin/
+/scripts/network/**/obj/
+/scripts/network/.vs/
 bulletheaven.db
