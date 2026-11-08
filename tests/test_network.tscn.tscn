@@ -32,3 +32,11 @@ text = "Zaloguj się"
 [node name="StatusLabel" type="Label" parent="VBoxContainer" unique_id=1438594964]
 layout_mode = 2
 text = "Oczekuję na akcję..."
+
+[node name="SubmitScoreButton" type="Button" parent="VBoxContainer" unique_id=1745400922]
+layout_mode = 2
+text = "Wyślij testowy plik"
+
+[node name="GetScoresButton" type="Button" parent="VBoxContainer" unique_id=616317973]
+layout_mode = 2
+text = "Pobierz TOP 10"

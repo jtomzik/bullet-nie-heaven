@@ -10,17 +10,33 @@ public partial class NetworkTest : Control
 
 	public override void _Ready()
 	{
-		// Odnalezienie węzłów UI w obrębie VBoxContainer
 		_loginInput = GetNode<LineEdit>("VBoxContainer/LoginInput");
 		_passwordInput = GetNode<LineEdit>("VBoxContainer/PasswordInput");
 		_statusLabel = GetNode<Label>("VBoxContainer/StatusLabel");
 		
-		// Pobranie Singletona
 		_apiClient = GetNode<ApiClient>("/root/ApiClient");
 
-		// Przypisanie zdarzeń kliknięcia
 		GetNode<Button>("VBoxContainer/RegisterButton").Pressed += OnRegisterPressed;
 		GetNode<Button>("VBoxContainer/LoginButton").Pressed += OnLoginPressed;
+		
+		// Nowe przyciski do obsługi wyników
+		GetNode<Button>("VBoxContainer/SubmitScoreButton").Pressed += OnSubmitScorePressed;
+		GetNode<Button>("VBoxContainer/GetScoresButton").Pressed += OnGetScoresPressed;
+	}
+
+	private async void OnSubmitScorePressed()
+	{
+		_statusLabel.Text = "Status: Wysyłanie wyniku...";
+		// Symulujemy wynik: 120 sekund przetrwania, 45 pokonanych wrogów
+		bool success = await _apiClient.SubmitScore(120, 45); 
+		_statusLabel.Text = success ? "Status: Wynik zapisany na serwerze!" : "Status: Błąd zapisu wyniku (niezalogowany?).";
+	}
+
+	private async void OnGetScoresPressed()
+	{
+		_statusLabel.Text = "Status: Pobieranie wyników...";
+		string jsonScores = await _apiClient.GetTop10Scores();
+		_statusLabel.Text = $"Status: Pobrano ranking.\n{jsonScores}";
 	}
 
 	private async void OnRegisterPressed()

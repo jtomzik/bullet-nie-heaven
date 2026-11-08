@@ -83,4 +83,63 @@ public partial class ApiClient : Node
 			return false;
 		}
 	}
+	
+	// Metoda wysyłająca wynik zalogowanego gracza na serwer
+	public async Task<bool> SubmitScore(int survivalTime, int enemiesKilled)
+	{
+		if (CurrentUserId == 0)
+		{
+			GD.PrintErr("Błąd: Gracz nie jest zalogowany.");
+			return false;
+		}
+
+		var requestData = new 
+		{ 
+			UserId = CurrentUserId, 
+			SurvivalTimeInSeconds = survivalTime, 
+			EnemiesKilled = enemiesKilled 
+		};
+		
+		string json = JsonSerializer.Serialize(requestData);
+		var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+		try
+		{
+			// Zwróć uwagę na prawidłowy adres endpointa wyników
+			HttpResponseMessage response = await client.PostAsync("https://localhost:7274/api/score", content);
+			if (response.IsSuccessStatusCode)
+			{
+				GD.Print("Wynik pomyślnie wysłany na serwer!");
+				return true;
+			}
+			
+			GD.PrintErr("Błąd podczas wysyłania wyniku.");
+			return false;
+		}
+		catch (Exception e)
+		{
+			GD.PrintErr($"Błąd połączenia: {e.Message}");
+			return false;
+		}
+	}
+
+	// Metoda pobierająca TOP 10 wyników
+	public async Task<string> GetTop10Scores()
+	{
+		try
+		{
+			HttpResponseMessage response = await client.GetAsync("https://localhost:7274/api/score/top10");
+			if (response.IsSuccessStatusCode)
+			{
+				// Zwraca surowy JSON, który później można sparsować do wyświetlenia w tabeli UI
+				string jsonResponse = await response.Content.ReadAsStringAsync();
+				return jsonResponse;
+			}
+			return "Błąd pobierania rankingu.";
+		}
+		catch (Exception e)
+		{
+			return $"Błąd połączenia: {e.Message}";
+		}
+	}
 }
