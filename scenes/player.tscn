@@ -1,12 +1,14 @@
 [gd_scene format=3 uid="uid://crd5rh167pksw"]
 
 [ext_resource type="Script" uid="uid://jk572ea1hvyv" path="res://scripts/Player.cs" id="1_4flbx"]
+[ext_resource type="PackedScene" path="res://scenes/entities/bullet.tscn" id="2_bullet"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aob73"]
 size = Vector2(32, 32)
 
 [node name="Player" type="CharacterBody2D" unique_id=122559061]
 script = ExtResource("1_4flbx")
+BulletScene = ExtResource("2_bullet")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=997601778]
 offset_left = -16.0
