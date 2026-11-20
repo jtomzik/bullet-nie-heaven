@@ -17,6 +17,9 @@ public partial class GameUI : CanvasLayer
 
 	public override void _Ready()
 	{
+		_healthBar ??= GetNodeOrNull<ProgressBar>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthBar");
+		_timerLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/TimerContainer/TimerLabel");
+
 		// Инициализация полоски здоровья
 		if (_healthBar != null)
 		{
