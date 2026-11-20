@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://d37dr5ef8v77p"]
+
+[ext_resource type="Script" uid="uid://bq1d4d8wud3mr" path="res://scripts/network/NetworkTest.cs" id="1_1mkry"]
+
+[node name="TestNetwork_tscn" type="Control" unique_id=688177530]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_1mkry")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1751249806]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LoginInput" type="LineEdit" parent="VBoxContainer" unique_id=1842377555]
+layout_mode = 2
+placeholder_text = "Wpisz login"
+
+[node name="PasswordInput" type="LineEdit" parent="VBoxContainer" unique_id=789363835]
+layout_mode = 2
+placeholder_text = "Wpisz hasło"
+secret = true
+
+[node name="RegisterButton" type="Button" parent="VBoxContainer" unique_id=1900012275]
+layout_mode = 2
+text = "Zarejestruj się"
+
+[node name="LoginButton" type="Button" parent="VBoxContainer" unique_id=96613241]
+layout_mode = 2
+text = "Zaloguj się"
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer" unique_id=1438594964]
+layout_mode = 2
+text = "Oczekuję na akcję..."
+
+[node name="SubmitScoreButton" type="Button" parent="VBoxContainer" unique_id=1745400922]
+layout_mode = 2
+text = "Wyślij testowy plik"
+
+[node name="GetScoresButton" type="Button" parent="VBoxContainer" unique_id=616317973]
+layout_mode = 2
+text = "Pobierz TOP 10"
