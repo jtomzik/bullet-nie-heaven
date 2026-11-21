@@ -22,4 +22,4 @@
 /scripts/network/**/bin/
 /scripts/network/**/obj/
 /scripts/network/.vs/
-bulletheaven.db
+bulletheaven.db*
