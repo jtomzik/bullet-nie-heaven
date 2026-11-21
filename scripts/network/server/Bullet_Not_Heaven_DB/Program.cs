@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Bullet_Not_Heaven_DB.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,13 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Automatyczne utworzenie/aktualizacja bazy SQLite przy starcie serwera
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -28,7 +36,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 

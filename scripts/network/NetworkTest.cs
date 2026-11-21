@@ -8,35 +8,51 @@ public partial class NetworkTest : Control
 	private Label _statusLabel;
 	private ApiClient _apiClient;
 
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		_loginInput = GetNode<LineEdit>("VBoxContainer/LoginInput");
 		_passwordInput = GetNode<LineEdit>("VBoxContainer/PasswordInput");
 		_statusLabel = GetNode<Label>("VBoxContainer/StatusLabel");
-		
+
 		_apiClient = GetNode<ApiClient>("/root/ApiClient");
 
 		GetNode<Button>("VBoxContainer/RegisterButton").Pressed += OnRegisterPressed;
 		GetNode<Button>("VBoxContainer/LoginButton").Pressed += OnLoginPressed;
-		
-		// Nowe przyciski do obsługi wyników
 		GetNode<Button>("VBoxContainer/SubmitScoreButton").Pressed += OnSubmitScorePressed;
 		GetNode<Button>("VBoxContainer/GetScoresButton").Pressed += OnGetScoresPressed;
+
+		// Automatyczny test połączenia przy starcie sceny
+		_statusLabel.Text = "Status: Łączenie z serwerem...";
+		bool online = await _apiClient.Ping();
+		_statusLabel.Text = online ? "Status: Serwer ONLINE" : "Status: Serwer OFFLINE";
 	}
 
 	private async void OnSubmitScorePressed()
 	{
 		_statusLabel.Text = "Status: Wysyłanie wyniku...";
-		// Symulujemy wynik: 120 sekund przetrwania, 45 pokonanych wrogów
-		bool success = await _apiClient.SubmitScore(120, 45); 
-		_statusLabel.Text = success ? "Status: Wynik zapisany na serwerze!" : "Status: Błąd zapisu wyniku (niezalogowany?).";
+		bool sentOnline = await _apiClient.SubmitScore(120, 45);
+		_statusLabel.Text = sentOnline
+			? "Status: Wynik zapisany ONLINE (i lokalnie)!"
+			: "Status: Tryb OFFLINE - wynik zapisany lokalnie.";
 	}
 
 	private async void OnGetScoresPressed()
 	{
 		_statusLabel.Text = "Status: Pobieranie wyników...";
-		string jsonScores = await _apiClient.GetTop10Scores();
-		_statusLabel.Text = $"Status: Pobrano ranking.\n{jsonScores}";
+		var scores = await _apiClient.GetTop10Scores();
+
+		if (scores.Count == 0)
+		{
+			_statusLabel.Text = "Status: Brak wyników.";
+			return;
+		}
+
+		string header = ApiClient.IsServerOnline ? "TOP 10 (ONLINE):\n" : "TOP 10 (OFFLINE - LOKALNE):\n";
+		for (int i = 0; i < scores.Count; i++)
+		{
+			header += $"{i + 1}. {scores[i].Username} - {scores[i].SurvivalTimeInSeconds}s ({scores[i].EnemiesKilled} zabitych)\n";
+		}
+		_statusLabel.Text = header;
 	}
 
 	private async void OnRegisterPressed()
