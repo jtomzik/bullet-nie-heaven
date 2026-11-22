@@ -1,7 +1,9 @@
 [gd_scene format=3 uid="uid://b2xq441lv6mxa"]
 
-[ext_resource type="PackedScene" uid="uid://crd5rh167pksw" path="res://scenes/entities/player.tscn" id="1_player"]
-[ext_resource type="PackedScene" path="res://scenes/entities/dummy_enemy.tscn" id="2_enemy"]
+[ext_resource type="Script" path="res://tests/TestCombat.cs" id="1_test"]
+[ext_resource type="PackedScene" uid="uid://crd5rh167pksw" path="res://scenes/entities/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/entities/dummy_enemy.tscn" id="3_enemy"]
+[ext_resource type="PackedScene" uid="uid://d3crcqmje8ywe" path="res://scenes/UI/HUD.tscn" id="4_hud"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(1280, 20)
@@ -10,25 +12,26 @@ size = Vector2(1280, 20)
 size = Vector2(20, 720)
 
 [node name="TestCombat" type="Node2D"]
+script = ExtResource("1_test")
 
 [node name="Background" type="ColorRect" parent="."]
 offset_right = 1152.0
 offset_bottom = 648.0
 color = Color(0.12, 0.13, 0.16, 1)
 
-[node name="Player" parent="." instance=ExtResource("1_player")]
+[node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(578, 324)
 
-[node name="DummyEnemy1" parent="." instance=ExtResource("2_enemy")]
+[node name="DummyEnemy1" parent="." instance=ExtResource("3_enemy")]
 position = Vector2(720, 324)
 
-[node name="DummyEnemy2" parent="." instance=ExtResource("2_enemy")]
+[node name="DummyEnemy2" parent="." instance=ExtResource("3_enemy")]
 position = Vector2(850, 324)
 
-[node name="DummyEnemy3" parent="." instance=ExtResource("2_enemy")]
+[node name="DummyEnemy3" parent="." instance=ExtResource("3_enemy")]
 position = Vector2(1050, 324)
 
-[node name="DummyEnemy4" parent="." instance=ExtResource("2_enemy")]
+[node name="DummyEnemy4" parent="." instance=ExtResource("3_enemy")]
 position = Vector2(400, 220)
 
 [node name="Walls" type="StaticBody2D" parent="."]
@@ -49,6 +52,8 @@ shape = SubResource("RectangleShape2D_wall_v")
 position = Vector2(1162, 324)
 shape = SubResource("RectangleShape2D_wall_v")
 
+[node name="GameUI" parent="." instance=ExtResource("4_hud")]
+
 [node name="Instructions" type="CanvasLayer" parent="."]
 
 [node name="InfoLabel" type="Label" parent="Instructions"]
@@ -57,10 +62,10 @@ offset_top = 490.0
 offset_right = 720.0
 offset_bottom = 636.0
 theme_override_font_sizes/font_size = 13
-text = "TEST SCRUM-28 & SCRUM-29: Auto-atak, System Życia i Obrażeń (Mechanika)
+text = "TEST SCRUM-28 & SCRUM-29: Auto-atak, System Życia i Obrażeń
 • WSAD / Strzałki: poruszanie się postaci
 • Auto-atak: postać namierza wrogów i strzela (pocisk: 25 dmg)
-• Wróg (DummyEnemy): reaguje mrugnięciem, przy 0 HP znika (QueueFree) i emituje GameEvents.OnEnemyDied
-• Kolizja z wrogiem: gracz traci 15 HP przy kontakcie (szczegóły w konsoli / Output)
+• Wróg (DummyEnemy): reaguje mrugnięciem, przy 0 HP znika (QueueFree)
+• Kolizja z wrogiem: gracz traci 15 HP przy dotknięciu wroga
 • Nietykalność (I-Frames): gracz mruga przez 0.8s po trafieniu
-• GameEvents: zdarzenia OnPlayerDamaged i OnPlayerDied są emitowane do szyny zdarzeń dla UI"
+• Pasek HP (GameUI): aktualizuje się w lewym górnym rogu"
