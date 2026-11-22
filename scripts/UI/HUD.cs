@@ -4,10 +4,15 @@ using BulletNieHeaven.Entities;
 
 namespace RogueGame.UI;
 
+/// <summary>
+/// Kontroler interfejsu użytkownika (HUD) podczas rozgrywki.
+/// Wyświetla pasek zdrowia gracza, licznik czasu oraz reaguje na zdarzenia z GameEvents.
+/// </summary>
 public partial class GameUI : CanvasLayer
 {
 	[ExportGroup("UI References")]
 	[Export] private ProgressBar _healthBar;
+	[Export] private Label _healthLabel;
 	[Export] private Label _timerLabel;
 
 	[ExportGroup("Settings")]
@@ -18,14 +23,23 @@ public partial class GameUI : CanvasLayer
 
 	public override void _Ready()
 	{
-		_healthBar ??= GetNodeOrNull<ProgressBar>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthBar");
-		_timerLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/TimerContainer/TimerLabel");
+		// Wyszukanie referencji do węzłów (zabezpieczenie ścieżką bezpośrednią oraz FindChild)
+		_healthBar ??= GetNodeOrNull<ProgressBar>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthBar")
+		               ?? FindChild("HealthBar", true, false) as ProgressBar;
+		_healthLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthLabel")
+		                 ?? FindChild("HealthLabel", true, false) as Label;
+		_timerLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/TimerContainer/TimerLabel")
+		                ?? FindChild("TimerLabel", true, false) as Label;
+
+		GD.Print($"[HUD] _Ready: _healthBar={(_healthBar != null ? "Znaleziono" : "BRAK")}, _healthLabel={(_healthLabel != null ? "Znaleziono" : "BRAK")}");
 
 		if (_healthBar != null)
 		{
 			_healthBar.MaxValue = _maxHealth;
 			_healthBar.Value = _currentHealth;
 		}
+
+		UpdateHealthText();
 
 		// Subskrypcja na globalne zdarzenie zmiany punktów życia gracza
 		GameEvents.OnPlayerHealthChanged += OnPlayerHealthChanged;
@@ -39,10 +53,6 @@ public partial class GameUI : CanvasLayer
 	private void OnPlayerHealthChanged(float currentHealth, float maxHealth)
 	{
 		_maxHealth = maxHealth;
-		if (_healthBar != null)
-		{
-			_healthBar.MaxValue = maxHealth;
-		}
 		UpdateHealth(currentHealth);
 	}
 
@@ -67,7 +77,18 @@ public partial class GameUI : CanvasLayer
 		_currentHealth = Mathf.Clamp(newHealth, 0f, _maxHealth);
 		if (_healthBar != null)
 		{
+			_healthBar.MaxValue = _maxHealth;
 			_healthBar.Value = _currentHealth;
+		}
+		UpdateHealthText();
+		GD.Print($"[HUD] Zaktualizowano pasek zdrowia: {_currentHealth}/{_maxHealth}");
+	}
+
+	private void UpdateHealthText()
+	{
+		if (_healthLabel != null)
+		{
+			_healthLabel.Text = $"HP: {Mathf.RoundToInt(_currentHealth)}/{Mathf.RoundToInt(_maxHealth)}";
 		}
 	}
 }

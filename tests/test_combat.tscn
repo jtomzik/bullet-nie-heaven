@@ -50,9 +50,11 @@ shape = SubResource("RectangleShape2D_wall_v")
 position = Vector2(1162, 324)
 shape = SubResource("RectangleShape2D_wall_v")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="GameUI" parent="." instance=ExtResource("3_hud")]
 
-[node name="InfoLabel" type="Label" parent="UI"]
+[node name="Instructions" type="CanvasLayer" parent="."]
+
+[node name="InfoLabel" type="Label" parent="Instructions"]
 offset_left = 12.0
 offset_top = 500.0
 offset_right = 680.0
@@ -65,5 +67,3 @@ text = "TEST SCRUM-28 & SCRUM-29: Auto-atak, System Życia i Obrażeń
 • Kolizja z wrogiem: gracz traci 15 HP przy dotknięciu wroga
 • Nietykalność (I-Frames): gracz mruga przez 0.8s po trafieniu
 • HUD (GameUI): pasek HP w lewym górnym rogu aktualizuje się w czasie rzeczywistym"
-
-[node name="GameUI" parent="UI" instance=ExtResource("3_hud")]
