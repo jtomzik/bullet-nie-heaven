@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using BulletNieHeaven.Entities;
 
 namespace RogueGame.UI;
 
@@ -20,17 +21,33 @@ public partial class GameUI : CanvasLayer
 		_healthBar ??= GetNodeOrNull<ProgressBar>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthBar");
 		_timerLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/TimerContainer/TimerLabel");
 
-		// Инициализация полоски здоровья
 		if (_healthBar != null)
 		{
 			_healthBar.MaxValue = _maxHealth;
 			_healthBar.Value = _currentHealth;
 		}
+
+		// Subskrypcja na globalne zdarzenie zmiany punktów życia gracza
+		GameEvents.OnPlayerHealthChanged += OnPlayerHealthChanged;
+	}
+
+	public override void _ExitTree()
+	{
+		GameEvents.OnPlayerHealthChanged -= OnPlayerHealthChanged;
+	}
+
+	private void OnPlayerHealthChanged(float currentHealth, float maxHealth)
+	{
+		_maxHealth = maxHealth;
+		if (_healthBar != null)
+		{
+			_healthBar.MaxValue = maxHealth;
+		}
+		UpdateHealth(currentHealth);
 	}
 
 	public override void _Process(double delta)
 	{
-		// Обновление таймера
 		_elapsedTime += (float)delta;
 		UpdateTimerDisplay(_elapsedTime);
 	}

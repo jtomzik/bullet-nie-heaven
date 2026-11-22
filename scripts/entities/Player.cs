@@ -5,10 +5,11 @@ namespace BulletNieHeaven;
 
 /// <summary>
 /// Reprezentuje postać gracza sterowaną przez użytkownika.
-/// Obsługuje poruszanie się (WSAD/strzałki), kolizje ze ścianami
-/// oraz automatyczny atak na najbliższego wroga w zasięgu.
+/// Obsługuje poruszanie się (WSAD/strzałki), kolizje ze ścianami,
+/// automatyczny atak na najbliższego wroga, zarządzanie zdrowiem (HealthComponent),
+/// chwilową nietykalność (I-Frames) oraz zgłaszanie zdarzeń do GameEvents.
 /// </summary>
-public partial class Player : CharacterBody2D
+public partial class Player : CharacterBody2D, IDamageable
 {
 	[ExportGroup("Ruch")]
 	/// <summary>
@@ -16,6 +17,25 @@ public partial class Player : CharacterBody2D
 	/// </summary>
 	[Export]
 	public float Speed { get; set; } = 300.0f;
+
+	[ExportGroup("Życie i Obrona")]
+	/// <summary>
+	/// Maksymalna pula punktów życia gracza.
+	/// </summary>
+	[Export]
+	public float MaxHealth { get; set; } = 100.0f;
+
+	/// <summary>
+	/// Czas trwania chwilowej nietykalności po otrzymaniu obrażeń (w sekundach).
+	/// </summary>
+	[Export]
+	public float InvulnerabilityDuration { get; set; } = 0.8f;
+
+	/// <summary>
+	/// Komponent punktów życia gracza.
+	/// </summary>
+	[Export]
+	public HealthComponent Health { get; set; }
 
 	[ExportGroup("Automatyczny Atak")]
 	/// <summary>
@@ -56,10 +76,33 @@ public partial class Player : CharacterBody2D
 	public float BulletLifetime { get; set; } = 2.0f;
 
 	private float _attackTimer = 0.0f;
+	private Tween _invulnerabilityTween;
 
 	public override void _Ready()
 	{
 		AddToGroup("player");
+
+		// Inicjalizacja HealthComponent
+		if (Health == null)
+		{
+			Health = GetNodeOrNull<HealthComponent>("HealthComponent");
+			if (Health == null)
+			{
+				Health = new HealthComponent();
+				Health.Name = "HealthComponent";
+				AddChild(Health);
+			}
+		}
+
+		Health.InvulnerabilityDuration = InvulnerabilityDuration;
+		Health.Initialize(MaxHealth);
+		Health.Damaged += OnPlayerDamaged;
+		Health.Died += OnPlayerDied;
+		Health.InvulnerabilityStarted += OnInvulnerabilityStarted;
+		Health.InvulnerabilityEnded += OnInvulnerabilityEnded;
+
+		// Wysłanie początkowego stanu zdrowia do UI / szyny zdarzeń
+		GameEvents.EmitPlayerHealthChanged(Health.CurrentHealth, Health.MaxHealth);
 
 		// Domyślne załadowanie sceny pocisku, jeśli nie ustawiono w Inspektorze
 		if (BulletScene == null)
@@ -70,7 +113,13 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (Health != null && Health.IsDead)
+		{
+			return;
+		}
+
 		HandleMovement();
+		CheckEnemyContactCollisions();
 		HandleAutoAttack((float)delta);
 	}
 
@@ -79,7 +128,6 @@ public partial class Player : CharacterBody2D
 	/// </summary>
 	private void HandleMovement()
 	{
-		// GetVector pobiera kierunki WSAD/strzałek i automatycznie normalizuje ruch po skosie
 		Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
 
 		if (direction != Vector2.Zero)
@@ -91,14 +139,88 @@ public partial class Player : CharacterBody2D
 			Velocity = Vector2.Zero;
 		}
 
-		// move_and_slide obsługuje fizykę kolizji ze ścianami areny
 		MoveAndSlide();
+	}
+
+	/// <summary>
+	/// Sprawdza kolizje kontaktowe z przeciwnikami i zadaje graczowi obrażenia kontaktowe.
+	/// </summary>
+	private void CheckEnemyContactCollisions()
+	{
+		int collisionCount = GetSlideCollisionCount();
+		for (int i = 0; i < collisionCount; i++)
+		{
+			KinematicCollision2D collision = GetSlideCollision(i);
+			if (collision.GetCollider() is Node collider)
+			{
+				if (collider.IsInGroup("enemies") || collider.IsInGroup("enemy"))
+				{
+					float contactDamage = 15.0f;
+					if (collider is DummyEnemy dummy)
+					{
+						contactDamage = dummy.ContactDamage;
+					}
+
+					TakeDamage(contactDamage);
+					break;
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Implementacja IDamageable - przekazuje obrażenia do HealthComponent.
+	/// </summary>
+	/// <param name="amount">Wartość obrażeń.</param>
+	public void TakeDamage(float amount)
+	{
+		Health?.Damage(amount);
+	}
+
+	/// <summary>
+	/// Obsługa otrzymania obrażeń przez gracza - emisja do GameEvents.
+	/// </summary>
+	private void OnPlayerDamaged(float amount)
+	{
+		GD.Print($"[Player] Otrzymano {amount} obrażeń! Pozostałe HP: {Health.CurrentHealth}/{Health.MaxHealth}");
+		GameEvents.EmitPlayerDamaged(Health.CurrentHealth, Health.MaxHealth);
+	}
+
+	/// <summary>
+	/// Efekt wizualny nietykalności - migotanie postaci.
+	/// </summary>
+	private void OnInvulnerabilityStarted()
+	{
+		_invulnerabilityTween?.Kill();
+		_invulnerabilityTween = CreateTween().SetLoops();
+		_invulnerabilityTween.TweenProperty(this, "modulate:a", 0.3f, 0.1f);
+		_invulnerabilityTween.TweenProperty(this, "modulate:a", 1.0f, 0.1f);
+	}
+
+	/// <summary>
+	/// Przywrócenie standardowego wyglądu po zakończeniu nietykalności.
+	/// </summary>
+	private void OnInvulnerabilityEnded()
+	{
+		_invulnerabilityTween?.Kill();
+		_invulnerabilityTween = null;
+		Modulate = Colors.White;
+	}
+
+	/// <summary>
+	/// Obsługa śmierci gracza.
+	/// </summary>
+	private void OnPlayerDied()
+	{
+		GD.Print("[Player] Gracz zginął! Koniec gry.");
+		_invulnerabilityTween?.Kill();
+		Modulate = new Color(0.4f, 0.4f, 0.4f, 0.8f);
+		GameEvents.EmitPlayerDied();
 	}
 
 	/// <summary>
 	/// Odlicza czas odnowienia ataku i wykonuje wystrzał do najbliższego wroga w zasięgu.
 	/// </summary>
-	/// <param name="delta">Czas od ostatniej klatki fizyki.</param>
 	private void HandleAutoAttack(float delta)
 	{
 		_attackTimer += delta;
@@ -117,15 +239,12 @@ public partial class Player : CharacterBody2D
 
 	/// <summary>
 	/// Wyszukuje najbliższego przeciwnika w obrębie zasięgu ataku (AttackRange).
-	/// Weryfikuje węzły należące do grup 'enemies' oraz 'enemy'.
 	/// </summary>
-	/// <returns>Węzeł Node2D najbliższego wroga lub null, gdy żaden nie znajduje się w zasięgu.</returns>
 	public Node2D FindNearestEnemy()
 	{
 		Node2D nearestEnemy = null;
 		float minDistanceSquared = AttackRange * AttackRange;
 
-		// Sprawdzenie wrogów z grupy "enemies"
 		var enemies = GetTree().GetNodesInGroup("enemies");
 		foreach (Node node in enemies)
 		{
@@ -140,7 +259,6 @@ public partial class Player : CharacterBody2D
 			}
 		}
 
-		// Sprawdzenie alternatywnej grupy "enemy" dla pełnej kompatybilności
 		if (nearestEnemy == null)
 		{
 			var altEnemies = GetTree().GetNodesInGroup("enemy");
@@ -163,9 +281,7 @@ public partial class Player : CharacterBody2D
 
 	/// <summary>
 	/// Tworzy pocisk i wystrzeliwuje go w stronę pozycji wskazanego celu.
-	/// Pocisk dodawany jest do sceny nadrzędnej, by poruszał się niezależnie od gracza.
 	/// </summary>
-	/// <param name="targetPosition">Współrzędne celu w przestrzeni globalnej.</param>
 	public void ShootAt(Vector2 targetPosition)
 	{
 		if (BulletScene == null)
@@ -185,8 +301,6 @@ public partial class Player : CharacterBody2D
 		bullet.GlobalPosition = GlobalPosition;
 		bullet.Initialize(direction, BulletSpeed, BulletDamage, BulletLifetime);
 
-		// Dodajemy pocisk do rodzica gracza (np. sceny areny/świata),
-		// aby nie poruszał się wraz z ruchem gracza
 		Node parent = GetParent();
 		if (parent != null)
 		{

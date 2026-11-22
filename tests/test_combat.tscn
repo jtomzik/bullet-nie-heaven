@@ -54,14 +54,16 @@ shape = SubResource("RectangleShape2D_wall_v")
 
 [node name="InfoLabel" type="Label" parent="UI"]
 offset_left = 12.0
-offset_top = 520.0
-offset_right = 642.0
-offset_bottom = 632.0
-theme_override_font_sizes/font_size = 14
-text = "TEST SCRUM-28: Automatyczny atak i pociski
-• WSAD / Strzałki - poruszanie się postaci
-• Auto-atak: postać automatycznie namierza najbliższego wroga w promieniu 400px
-• Obrażenia: pocisk zadaje 25 obrażeń (DummyEnemy ma 50 HP = 2 trafienia)
-• Zasięg życia pocisku: 2 sekundy"
+offset_top = 500.0
+offset_right = 680.0
+offset_bottom = 636.0
+theme_override_font_sizes/font_size = 13
+text = "TEST SCRUM-28 & SCRUM-29: Auto-atak, System Życia i Obrażeń
+• WSAD / Strzałki: poruszanie się postaci
+• Auto-atak: postać namierza wrogów i strzela (pocisk: 25 dmg)
+• Wróg (DummyEnemy): reaguje mrugnięciem, przy 0 HP znika (QueueFree)
+• Kolizja z wrogiem: gracz traci 15 HP przy dotknięciu wroga
+• Nietykalność (I-Frames): gracz mruga przez 0.8s po trafieniu
+• HUD (GameUI): pasek HP w lewym górnym rogu aktualizuje się w czasie rzeczywistym"
 
 [node name="GameUI" parent="UI" instance=ExtResource("3_hud")]
