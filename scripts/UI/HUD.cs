@@ -1,18 +1,12 @@
 using Godot;
 using System;
-using BulletNieHeaven.Entities;
 
 namespace RogueGame.UI;
 
-/// <summary>
-/// Kontroler interfejsu użytkownika (HUD) podczas rozgrywki.
-/// Wyświetla pasek zdrowia gracza, licznik czasu oraz reaguje na zdarzenia z GameEvents.
-/// </summary>
 public partial class GameUI : CanvasLayer
 {
 	[ExportGroup("UI References")]
 	[Export] private ProgressBar _healthBar;
-	[Export] private Label _healthLabel;
 	[Export] private Label _timerLabel;
 
 	[ExportGroup("Settings")]
@@ -23,41 +17,20 @@ public partial class GameUI : CanvasLayer
 
 	public override void _Ready()
 	{
-		// Wyszukanie referencji do węzłów (zabezpieczenie ścieżką bezpośrednią oraz FindChild)
-		_healthBar ??= GetNodeOrNull<ProgressBar>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthBar")
-		               ?? FindChild("HealthBar", true, false) as ProgressBar;
-		_healthLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthLabel")
-		                 ?? FindChild("HealthLabel", true, false) as Label;
-		_timerLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/TimerContainer/TimerLabel")
-		                ?? FindChild("TimerLabel", true, false) as Label;
+		_healthBar ??= GetNodeOrNull<ProgressBar>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthBar");
+		_timerLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/TimerContainer/TimerLabel");
 
-		GD.Print($"[HUD] _Ready: _healthBar={(_healthBar != null ? "Znaleziono" : "BRAK")}, _healthLabel={(_healthLabel != null ? "Znaleziono" : "BRAK")}");
-
+		// Инициализация полоски здоровья
 		if (_healthBar != null)
 		{
 			_healthBar.MaxValue = _maxHealth;
 			_healthBar.Value = _currentHealth;
 		}
-
-		UpdateHealthText();
-
-		// Subskrypcja na globalne zdarzenie zmiany punktów życia gracza
-		GameEvents.OnPlayerHealthChanged += OnPlayerHealthChanged;
-	}
-
-	public override void _ExitTree()
-	{
-		GameEvents.OnPlayerHealthChanged -= OnPlayerHealthChanged;
-	}
-
-	private void OnPlayerHealthChanged(float currentHealth, float maxHealth)
-	{
-		_maxHealth = maxHealth;
-		UpdateHealth(currentHealth);
 	}
 
 	public override void _Process(double delta)
 	{
+		// Обновление таймера
 		_elapsedTime += (float)delta;
 		UpdateTimerDisplay(_elapsedTime);
 	}
@@ -77,18 +50,7 @@ public partial class GameUI : CanvasLayer
 		_currentHealth = Mathf.Clamp(newHealth, 0f, _maxHealth);
 		if (_healthBar != null)
 		{
-			_healthBar.MaxValue = _maxHealth;
 			_healthBar.Value = _currentHealth;
-		}
-		UpdateHealthText();
-		GD.Print($"[HUD] Zaktualizowano pasek zdrowia: {_currentHealth}/{_maxHealth}");
-	}
-
-	private void UpdateHealthText()
-	{
-		if (_healthLabel != null)
-		{
-			_healthLabel.Text = $"HP: {Mathf.RoundToInt(_currentHealth)}/{Mathf.RoundToInt(_maxHealth)}";
 		}
 	}
 }
