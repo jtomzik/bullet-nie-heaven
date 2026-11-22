@@ -6,7 +6,8 @@ namespace RogueGame.UI;
 public partial class GameUI : CanvasLayer
 {
 	[ExportGroup("UI References")]
-	[Export] private ProgressBar _healthBar;
+	[Export] private TextureProgressBar _healthBar;
+	[Export] private Label _healthLabel;
 	[Export] private Label _timerLabel;
 
 	[ExportGroup("Settings")]
@@ -17,10 +18,11 @@ public partial class GameUI : CanvasLayer
 
 	public override void _Ready()
 	{
-		_healthBar ??= GetNodeOrNull<ProgressBar>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthBar");
+		_healthBar ??= GetNodeOrNull<TextureProgressBar>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthBar");
+		_healthLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthLabel");
 		_timerLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/TimerContainer/TimerLabel");
 
-		// Инициализация полоски здоровья
+		// Inicjalizacja paska zdrowia
 		if (_healthBar != null)
 		{
 			_healthBar.MaxValue = _maxHealth;
@@ -30,7 +32,7 @@ public partial class GameUI : CanvasLayer
 
 	public override void _Process(double delta)
 	{
-		// Обновление таймера
+		// Aktualizacja timera
 		_elapsedTime += (float)delta;
 		UpdateTimerDisplay(_elapsedTime);
 	}
