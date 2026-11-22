@@ -1,8 +1,13 @@
 using Godot;
 using System;
+using BulletNieHeaven.Entities;
 
 namespace RogueGame.UI;
 
+/// <summary>
+/// Kontroler interfejsu użytkownika (HUD) podczas rozgrywki.
+/// Wyświetla pasek zdrowia gracza, licznik czasu oraz reaguje na zdarzenia z GameEvents.
+/// </summary>
 public partial class GameUI : CanvasLayer
 {
 	[ExportGroup("UI References")]
@@ -22,12 +27,28 @@ public partial class GameUI : CanvasLayer
 		_healthLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/HealthContainer/HealthLabel");
 		_timerLabel ??= GetNodeOrNull<Label>("HUD/MarginContainer/TopBarContainer/TimerContainer/TimerLabel");
 
-		// Inicjalizacja paska zdrowia
+		// Inicjalizacja paska zdrowia i tekstu
 		if (_healthBar != null)
 		{
 			_healthBar.MaxValue = _maxHealth;
 			_healthBar.Value = _currentHealth;
 		}
+		UpdateHealthText();
+
+		// Subskrypcja na globalne zdarzenie zmiany punktów życia gracza
+		GameEvents.OnPlayerHealthChanged += OnPlayerHealthChanged;
+	}
+
+	public override void _ExitTree()
+	{
+		// Odpięcie subskrypcji przy usuwaniu węzła, zapobiega wyciekom pamięci
+		GameEvents.OnPlayerHealthChanged -= OnPlayerHealthChanged;
+	}
+
+	private void OnPlayerHealthChanged(float currentHealth, float maxHealth)
+	{
+		_maxHealth = maxHealth;
+		UpdateHealth(currentHealth);
 	}
 
 	public override void _Process(double delta)
@@ -52,7 +73,17 @@ public partial class GameUI : CanvasLayer
 		_currentHealth = Mathf.Clamp(newHealth, 0f, _maxHealth);
 		if (_healthBar != null)
 		{
+			_healthBar.MaxValue = _maxHealth;
 			_healthBar.Value = _currentHealth;
+		}
+		UpdateHealthText();
+	}
+
+	private void UpdateHealthText()
+	{
+		if (_healthLabel != null)
+		{
+			_healthLabel.Text = $"HP: {Mathf.RoundToInt(_currentHealth)}/{Mathf.RoundToInt(_maxHealth)}";
 		}
 	}
 }
