@@ -19,3 +19,15 @@ color = Color(1, 0, 0, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=766367632]
 shape = SubResource("RectangleShape2D_aob73")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1849204732]
+zoom = Vector2(2, 2)
+process_callback = 0
+limit_left = 0
+limit_top = 0
+limit_right = 1152
+limit_bottom = 648
+limit_smoothed = true
+position_smoothing_enabled = true
+position_smoothing_speed = 5.0
+editor_draw_limits = true
